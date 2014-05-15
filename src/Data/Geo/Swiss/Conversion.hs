@@ -27,20 +27,38 @@ instance Show WGS84 where
 
 -- | Coordinates in the current Swiss system "Landesvermessung 1995"
 --   First longitude, then lattitude
--- data CH95 = LV95 Int Int
-data CH95 = LV95 Double Double
+--   Here accuracy is 1 meter.
+--   Note: Your GPS measurements may NOT have this precision!!
+data CH95 = LV95 Int Int
+   deriving (Eq, Show)
+
+-- | High precision version of Swiss system "Landesvermessung 1995"
+-- Here accuracy is better than 1 cm.
+-- We normally round up to 2 decimal digits.
+-- Note: Your GPS measurements may NOT have this precision!!
+data CH95HP = LV95HP Double Double
    deriving (Eq, Show)
 
 -- | Coordinates in the old Swiss system "Landesvermessung 1903"
 --   First longitude, then lattitude
+--   Here accuracy is 1 meter.
 data CH03 = LV03 Int Int
    deriving (Eq, Show)
+
+-- | Conversion from the High Precision System to the normal version
+fromHP :: CH95HP -> CH95
+fromHP (LV95HP y x) = LV95 (round y) (round x)
+
+-- | Conversion fron normal 1-meter coordiantes to 1 cm coordinates.
+-- Note: We cannot add the missing accuracy in centimeters!
+toHP :: CH95 -> CH95HP
+toHP (LV95 y x) = LV95HP (fromIntegral y) (fromIntegral x)
 
 -- | Convert World coordiantes to Swiss coordinates LV95
 -- Exact formula.
 -- See : 3.2 Ellipsoid. Koordinaten (λ, φ) ⇒ Schweiz. Projektionskoordinaten (y, x)
-wgs2ch :: WGS84 -> CH95
-wgs2ch (WGS latt long) = LV95 yy' xx'
+wgs2chHP :: WGS84 -> CH95HP
+wgs2chHP (WGS latt long) = LV95HP yy' xx'
   where
     -- Input
     phi = deg2rad latt
@@ -66,14 +84,19 @@ wgs2ch (WGS latt long) = LV95 yy' xx'
     -- c) Kugel ( b , l ) ⇒ Projektionsebene (y, x) (Mercator-Projektion)
     yy = rr * l'
     xx = rr/2 * log ((1 + sin b') / (1 - sin b'))
-    yy' = {-round-} yy + 2600000
-    xx' = {-round-} xx + 1200000
+    yy' = round2dec yy + 2600000
+    xx' = round2dec xx + 1200000
+
+-- | Convert Word coordinates to Swiss coordinates
+-- Accuracy is 1 meter
+wgs2ch :: WGS84 -> CH95
+wgs2ch = fromHP . wgs2chHP
 
 -- | Convert Swiss coordinates to World coordinates
 -- Exact formula
 -- See: 3.3 Schweizer Projektionskoordinaten (y, x) ⇒ ellipsoid. Koordinaten (λ, φ)
--- ch2wgs :: CH95 -> WGS
-ch2wgs (LV95 y x) = WGS psi lam
+ch2wgsHP :: CH95HP -> WGS84
+ch2wgsHP (LV95HP y x) = WGS psi lam
   where
     -- Constants
     a = 6377397.155
@@ -86,8 +109,8 @@ ch2wgs (LV95 y x) = WGS psi lam
     b0 = deg2rad (Deg 46 54 27.83324844)
     kk = 0.0030667323772751
     -- a) Projektionsebene (y, x) ⇒ Kugel ( b , l )
-    yy = {-fromIntegral-} y - 2600000
-    xx = {-fromIntegral-} x - 1200000
+    yy = y - 2600000
+    xx = x - 1200000
     l' = yy / rr
     b' = 2 * atan (exp (xx/rr)) - pi/2    -- pi/2 instead of pi/4 outside 2*
     -- b) Pseudoäquatorsystem ( b , l ) ⇒ Äquatorsystem (b, l)
@@ -104,6 +127,9 @@ ch2wgs (LV95 y x) = WGS psi lam
     -- Normally we need 5 to 7 iterations.
     psi = rad2deg $ firstEqual $ take 50 $ iterate (fpsi . fss) b
 
+-- | Convert Swiss coordinates to World coordinates (1 meter accuracy)
+ch2wgs :: CH95 -> WGS84
+ch2wgs = ch2wgsHP . toHP
 
 -- | Find the convergence of a sequence.
 -- We just search for the first element that is euql to its successsor
@@ -114,13 +140,19 @@ firstEqual (x : y : zs)
     | x == y = x
     | otherwise = firstEqual (y : zs)
 
+-- | round a Double to 2 digits after the decimal point
+round2dec :: Double -> Double
+round2dec d = fromIntegral (round (d * 100)) / 100
 
 -- | Some examples. (Move later to tests)
 wgsBern :: WGS84
 wgsBern = WGS (Deg 46 57 08.66) (Deg 7 26 22.50)
 
+chBern :: CH95
+chBern = LV95 2600000 1200000
+
 wgsRigi :: WGS84
 wgsRigi = WGS (Deg 47 03 28.956559233) (Deg 8 29 11.11127154)
 
-chRigi :: CH95
-chRigi = LV95 2679520.05 1212273.44
+chRigi :: CH95HP
+chRigi = LV95HP 2679520.05 1212273.44
