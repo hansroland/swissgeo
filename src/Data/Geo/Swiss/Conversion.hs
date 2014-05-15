@@ -73,7 +73,7 @@ wgs2ch (WGS latt long) = LV95 yy' xx'
 -- Exact formula
 -- See: 3.3 Schweizer Projektionskoordinaten (y, x) ⇒ ellipsoid. Koordinaten (λ, φ)
 -- ch2wgs :: CH95 -> WGS
-ch2wgs (LV95 y x) = WGS lam psi
+ch2wgs (LV95 y x) = WGS psi lam
   where
     -- Constants
     a = 6377397.155
@@ -92,7 +92,7 @@ ch2wgs (LV95 y x) = WGS lam psi
     b' = 2 * atan (exp (xx/rr)) - pi/2    -- pi/2 instead of pi/4 outside 2*
     -- b) Pseudoäquatorsystem ( b , l ) ⇒ Äquatorsystem (b, l)
     b = asin(cos b0 * sin b' + sin b0 * cos b' * cos l')
-    l = atan (sin l') / (cos b0 * cos l' - sin b0 * tan b')
+    l = atan $ (sin l') / (cos b0 * cos l' - sin b0 * tan b')
     -- c) Kugel (b, l) ⇒ Ellipsoid (φ, λ)
     lam = rad2deg $ lam0 + l/alfa
     -- The base functions for the iteration
