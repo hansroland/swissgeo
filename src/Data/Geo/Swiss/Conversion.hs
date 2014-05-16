@@ -1,3 +1,5 @@
+{-# LANGUAGE NamedFieldPuns #-}
+
 -- | Geographical Degrees:  Deg degrees minutes seconds
 data Degree = Deg Int Int Double
    deriving (Eq, Show)
@@ -54,6 +56,31 @@ fromHP (LV95HP y x) = LV95 (round y) (round x)
 toHP :: CH95 -> CH95HP
 toHP (LV95 y x) = LV95HP (fromIntegral y) (fromIntegral x)
 
+-- | Constants used in both conversion calculations
+data Consts = Consts {
+     a :: Double				-- grosse Halbachse des Bessel-Ellipsoids
+   , ee  :: Double              -- ee**2 = 1.numerische Exzentrizität (im Quadrat) des Bessel-Ellipsoids
+   , phi0 :: Double             -- geogr. Breite des Nullpunkts in Bern
+   , lam0 :: Double             -- geogr. Länge des Nullpunkts in Bern
+   , rr :: Double               -- Radius der Projektionskugel
+   , alfa :: Double             -- Verhältnis Kugellänge zu Ellipsoidlänge
+   , b0 :: Double               -- Breite des Nullpunkts auf der Kugel
+   , kk :: Double               -- Konstante der Breitenformel
+   }
+
+-- | Constants used in the calculations
+consts :: Consts
+consts = Consts {
+   a = 6377397.155
+   , ee = sqrt 0.006674372230614
+   , phi0 = deg2rad (Deg 46 57 8.66)
+   , lam0 = deg2rad (Deg  7 26 22.5)
+   , rr = 6378815.90365
+   , alfa = 1.00072913843038
+   , b0 = deg2rad (Deg 46 54 27.83324844)
+   , kk = 0.0030667323772751
+   }
+
 -- | Convert World coordiantes to Swiss coordinates LV95
 -- Exact formula.
 -- See : 3.2 Ellipsoid. Koordinaten (λ, φ) ⇒ Schweiz. Projektionskoordinaten (y, x)
@@ -64,17 +91,9 @@ wgs2chHP (WGS latt long) = LV95HP yy' xx'
     phi = deg2rad latt
     lam = deg2rad long
     -- Constants
-    a = 6377397.155
-    ee2 = 0.006674372230614
-    ee = sqrt ee2
-    phi0 = deg2rad (Deg 46 57 8.66)
-    lam0 = deg2rad (Deg  7 26 22.5)
-    rr = 6378815.90365
-    alfa = 1.00072913843038
-    b0 = deg2rad (Deg 46 54 27.83324844)
-    kk = 0.0030667323772751
+    Consts {a, ee, phi0, lam0, rr, alfa, b0, kk} = consts
     -- a) Ellipsoid (φ, λ) ⇒ Kugel (b, l) (Gauss'sche Projektion)
-    ss = alfa * log(tan(pi/4 + phi/2) ) - alfa * ee/2 
+    ss = alfa * log(tan(pi/4 + phi/2) ) - alfa * ee/2
        * log ((1 + ee * sin phi) / (1 - ee * sin phi)) + kk
     b = 2 * (atan (exp ss) - pi/4)
     l = alfa * (lam -lam0)
@@ -99,15 +118,7 @@ ch2wgsHP :: CH95HP -> WGS84
 ch2wgsHP (LV95HP y x) = WGS psi lam
   where
     -- Constants
-    a = 6377397.155
-    ee2 = 0.006674372230614
-    ee = sqrt ee2
-    phi0 = deg2rad (Deg 46 57 8.66)
-    lam0 = deg2rad (Deg  7 26 22.5)
-    rr = 6378815.90365
-    alfa = 1.00072913843038
-    b0 = deg2rad (Deg 46 54 27.83324844)
-    kk = 0.0030667323772751
+    Consts {a, ee, phi0, lam0, rr, alfa, b0, kk} = consts
     -- a) Projektionsebene (y, x) ⇒ Kugel ( b , l )
     yy = y - 2600000
     xx = x - 1200000
@@ -115,7 +126,7 @@ ch2wgsHP (LV95HP y x) = WGS psi lam
     b' = 2 * atan (exp (xx/rr)) - pi/2    -- pi/2 instead of pi/4 outside 2*
     -- b) Pseudoäquatorsystem ( b , l ) ⇒ Äquatorsystem (b, l)
     b = asin(cos b0 * sin b' + sin b0 * cos b' * cos l')
-    l = atan $ (sin l') / (cos b0 * cos l' - sin b0 * tan b')
+    l = atan $ sin l' / (cos b0 * cos l' - sin b0 * tan b')
     -- c) Kugel (b, l) ⇒ Ellipsoid (φ, λ)
     lam = rad2deg $ lam0 + l/alfa
     -- The base functions for the iteration
