@@ -1,6 +1,10 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
+module Data.Geo.Swiss.Conversion
+  where
+
 -- | Geographical Degrees:  Deg degrees minutes seconds
+--   Example: Deg 46 57 8.66 
 data Degree = Deg Int Int Double
    deriving (Eq, Show)
 
@@ -36,7 +40,7 @@ data CH95 = LV95 Int Int
 
 -- | High precision version of Swiss system "Landesvermessung 1995"
 -- Here accuracy is better than 1 cm.
--- We normally round up to 2 decimal digits.
+-- We normally round to 2 decimal digits (= 1 cm).
 -- Note: Your GPS measurements may NOT have this precision!!
 data CH95HP = LV95HP Double Double
    deriving (Eq, Show)
@@ -56,11 +60,9 @@ fromHP (LV95HP y x) = LV95 (round y) (round x)
 toHP :: CH95 -> CH95HP
 toHP (LV95 y x) = LV95HP (fromIntegral y) (fromIntegral x)
 
--- | Constants used in both conversion calculations
+-- | Constants used in both conversion functions
 data Consts = Consts {
-     a :: Double				-- grosse Halbachse des Bessel-Ellipsoids
-   , ee  :: Double              -- ee**2 = 1.numerische Exzentrizität (im Quadrat) des Bessel-Ellipsoids
-   , phi0 :: Double             -- geogr. Breite des Nullpunkts in Bern
+   ee  :: Double                -- ee**2 = 1.numerische Exzentrizität (im Quadrat) des Bessel-Ellipsoids
    , lam0 :: Double             -- geogr. Länge des Nullpunkts in Bern
    , rr :: Double               -- Radius der Projektionskugel
    , alfa :: Double             -- Verhältnis Kugellänge zu Ellipsoidlänge
@@ -71,9 +73,7 @@ data Consts = Consts {
 -- | Constants used in the calculations
 consts :: Consts
 consts = Consts {
-   a = 6377397.155
-   , ee = sqrt 0.006674372230614
-   , phi0 = deg2rad (Deg 46 57 8.66)
+   ee = sqrt 0.006674372230614
    , lam0 = deg2rad (Deg  7 26 22.5)
    , rr = 6378815.90365
    , alfa = 1.00072913843038
@@ -91,7 +91,7 @@ wgs2chHP (WGS latt long) = LV95HP yy' xx'
     phi = deg2rad latt
     lam = deg2rad long
     -- Constants
-    Consts {a, ee, phi0, lam0, rr, alfa, b0, kk} = consts
+    Consts {ee, lam0, rr, alfa, b0, kk} = consts
     -- a) Ellipsoid (φ, λ) ⇒ Kugel (b, l) (Gauss'sche Projektion)
     ss = alfa * log(tan(pi/4 + phi/2) ) - alfa * ee/2
        * log ((1 + ee * sin phi) / (1 - ee * sin phi)) + kk
@@ -118,7 +118,7 @@ ch2wgsHP :: CH95HP -> WGS84
 ch2wgsHP (LV95HP y x) = WGS psi lam
   where
     -- Constants
-    Consts {a, ee, phi0, lam0, rr, alfa, b0, kk} = consts
+    Consts {ee, lam0, rr, alfa, b0, kk} = consts
     -- a) Projektionsebene (y, x) ⇒ Kugel ( b , l )
     yy = y - 2600000
     xx = x - 1200000
@@ -130,8 +130,8 @@ ch2wgsHP (LV95HP y x) = WGS psi lam
     -- c) Kugel (b, l) ⇒ Ellipsoid (φ, λ)
     lam = rad2deg $ lam0 + l/alfa
     -- The base functions for the iteration
-    fss psi = 1 / alfa * (log (tan (pi/4 + b/2)) - kk) + ee
-      * log (tan (pi/4 + asin(ee * sin psi) / 2))
+    fss psx = 1 / alfa * (log (tan (pi/4 + b/2)) - kk) + ee
+      * log (tan (pi/4 + asin(ee * sin psx) / 2))
     fpsi ss = 2 * atan (exp ss) - pi/2
     -- To avoid infinite loops, do at most 50 iterations,
     -- hopefully it stops earlier ...
@@ -153,7 +153,9 @@ firstEqual (x : y : zs)
 
 -- | round a Double to 2 digits after the decimal point
 round2dec :: Double -> Double
-round2dec d = fromIntegral (round (d * 100)) / 100
+round2dec d = 
+    let i = (round (d * 100)) :: Int
+    in fromIntegral i / 100
 
 -- | Some examples. (Move later to tests)
 wgsBern :: WGS84
