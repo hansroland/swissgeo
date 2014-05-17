@@ -103,8 +103,8 @@ wgs2chHP (WGS latt long) = LV95HP yy' xx'
     -- c) Kugel ( b , l ) ⇒ Projektionsebene (y, x) (Mercator-Projektion)
     yy = rr * l'
     xx = rr/2 * log ((1 + sin b') / (1 - sin b'))
-    yy' = round2dec yy + 2600000
-    xx' = round2dec xx + 1200000
+    yy' = round2digs yy + 2600000
+    xx' = round2digs xx + 1200000
 
 -- | Convert Word coordinates to Swiss coordinates
 -- Accuracy is 1 meter
@@ -152,11 +152,12 @@ firstEqual (x : y : zs)
     | otherwise = firstEqual (y : zs)
 
 -- | round a Double to 2 digits after the decimal point
-round2dec :: Double -> Double
-round2dec d = 
+round2digs :: Double -> Double
+round2digs d = 
     let i = (round (d * 100)) :: Int
     in fromIntegral i / 100
 
+{-
 -- | Some examples. (Move later to tests)
 wgsBern :: WGS84
 wgsBern = WGS (Deg 46 57 08.66) (Deg 7 26 22.50)
@@ -169,3 +170,4 @@ wgsRigi = WGS (Deg 47 03 28.956559233) (Deg 8 29 11.11127154)
 
 chRigi :: CH95HP
 chRigi = LV95HP 2679520.05 1212273.44
+-}
