@@ -60,14 +60,22 @@ fromHP (LV95HP y x) = LV95 (round y) (round x)
 toHP :: CH95 -> CH95HP
 toHP (LV95 y x) = LV95HP (fromIntegral y) (fromIntegral x)
 
+-- | Convert CH95 coordinates to CH03 coordinates
+to03 :: CH95 -> CH03
+to03 (LV95 x y) = LV03 (x - 2000000) (y - 1000000)
+
+-- | Convert CH03 coordinates to CH95 coordinates
+to95 :: CH03 -> CH95
+to95 (LV03 x y) =  LV95 (x + 2000000) (y + 1000000)
+
 -- | Constants used in both conversion functions
 data Consts = Consts {
-   ee  :: Double                -- ee**2 = 1.numerische Exzentrizität (im Quadrat) des Bessel-Ellipsoids
-   , lam0 :: Double             -- geogr. Länge des Nullpunkts in Bern
-   , rr :: Double               -- Radius der Projektionskugel
-   , alfa :: Double             -- Verhältnis Kugellänge zu Ellipsoidlänge
-   , b0 :: Double               -- Breite des Nullpunkts auf der Kugel
-   , kk :: Double               -- Konstante der Breitenformel
+   ee  :: Double            -- E = ee. E**2 = 1.numerische Exzentrizität (im Quadrat) des Bessel-Ellipsoids
+   , lam0 :: Double         -- geogr. Länge des Nullpunkts in Bern
+   , rr :: Double           -- R = rr. Radius R der Projektionskugel
+   , alfa :: Double         -- Verhältnis Kugellänge zu Ellipsoidlänge
+   , b0 :: Double           -- Breite des Nullpunkts auf der Kugel
+   , kk :: Double           -- Konstante K der Breitenformel
    }
 
 -- | Constants used in the calculations
@@ -157,17 +165,3 @@ round2digs d =
     let i = (round (d * 100)) :: Int
     in fromIntegral i / 100
 
-{-
--- | Some examples. (Move later to tests)
-wgsBern :: WGS84
-wgsBern = WGS (Deg 46 57 08.66) (Deg 7 26 22.50)
-
-chBern :: CH95
-chBern = LV95 2600000 1200000
-
-wgsRigi :: WGS84
-wgsRigi = WGS (Deg 47 03 28.956559233) (Deg 8 29 11.11127154)
-
-chRigi :: CH95HP
-chRigi = LV95HP 2679520.05 1212273.44
--}
