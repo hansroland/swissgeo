@@ -4,7 +4,7 @@ name:                swissgeo
 version:             0.2.0.1
 synopsis:            Convert GPS Coordinates to Swiss Geographical Coordinates
 description:         Convert GPS Coordinates to Swiss Geographical Coordinates
-homepage:            http://www.github.com/hansroland/hexif
+homepage:            http://www.github.com/hansroland/swissgeo
 license:             BSD3
 license-file:        LICENSE
 author:              Roland Senn
@@ -23,13 +23,13 @@ library
     ghc-options:         -Wall
 
 Test-suite test
-   Default-language:     Haskell2010
-   Type:                 exitcode-stdio-1.0
-   Hs-source-dirs:       tests
-   Main-is:              Main.hs
-   Build-depends:        base >= 4 && < 5
-                         , tasty >= 0.8 && < 0.9
-                         , tasty-quickcheck >= 0.8 && < 0.9
-                         , tasty-hunit >= 0.8 && < 0.9
-                         , swissgeo >= 0.2 && < 0.3
+    Default-language:    Haskell2010
+    Type:                exitcode-stdio-1.0
+    Hs-source-dirs:      tests
+    Main-is:             Main.hs
+    Build-depends:       base >= 4 && < 5
+                        , tasty >= 0.8 && < 0.9
+                        , tasty-quickcheck >= 0.8 && < 0.9
+                        , tasty-hunit >= 0.8 && < 0.9
+                        , swissgeo >= 0.2 && < 0.3
  
