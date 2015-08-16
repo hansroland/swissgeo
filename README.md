@@ -42,4 +42,8 @@ swissgeo implements the exact formulas.
     to03 :: CH95 -> CH03                -- Convert from 1995 to 1903 Swiss coordinates
 
 
+#### Versions
 
+    0.2.0.4   -> GHC 7.10.1
+    0.2.0.3   -> GHC 7.8.4
+    0.2.0.2   -> GHC 7.8.3
