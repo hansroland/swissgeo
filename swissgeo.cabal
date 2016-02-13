@@ -30,7 +30,6 @@ Test-suite test
     Hs-source-dirs:      tests
     Main-is:             Main.hs
     Build-depends:       base >= 4.7.0 && < 4.8.3
-                       , tasty >= 0.10.1 &&  < 0.11.1
-                       , tasty-quickcheck >= 0.8.3 && < 0.8.5
-                       , tasty-hunit >= 0.9.2 && < 0.9.3
                        , swissgeo >= 0.2.0 && < 0.2.1
+                       , QuickCheck >= 2.8.2 && < 2.8.3
+                       , cabal-test-quickcheck >= 0.1.6 && < 0.1.7
