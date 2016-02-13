@@ -4,6 +4,7 @@ name:                swissgeo
 version:             0.2.0.6
 synopsis:            Convert GPS Coordinates to Swiss Geographical Coordinates
 description:         Convert GPS Coordinates to Swiss Geographical Coordinates
+                     and vice versa
 homepage:            http://www.github.com/hansroland/swissgeo
 license:             BSD3
 license-file:        LICENSE

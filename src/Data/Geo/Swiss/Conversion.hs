@@ -4,7 +4,7 @@ module Data.Geo.Swiss.Conversion
   where
 
 -- | Geographical Degrees:  Deg degrees minutes seconds
---   Example: Deg 46 57 8.66 
+--   Example: Deg 46 57 8.66
 data Degree = Deg Int Int Double
    deriving (Eq, Show)
 
@@ -161,7 +161,6 @@ firstEqual (x : y : zs)
 
 -- | round a Double to 2 digits after the decimal point
 round2digs :: Double -> Double
-round2digs d = 
-    let i = (round (d * 100)) :: Int
+round2digs d =
+    let i = round (d * 100) :: Int
     in fromIntegral i / 100
-
