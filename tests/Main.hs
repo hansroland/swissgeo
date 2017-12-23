@@ -29,7 +29,7 @@ myArgs = Args
   , maxDiscardRatio = 10
   , maxSize         = 1000
   , chatty          = True
--- noShrinking flag?
+  , maxShrinks      = 0
   }
 
 -- | Make datatype CH95 eligible for testing with QuickCheck

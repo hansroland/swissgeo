@@ -1,7 +1,7 @@
 -- Cabal File for the swissgeo project
 
 name:                swissgeo
-version:             0.2.0.8
+version:             0.2.0.9
 synopsis:            Convert GPS Coordinates to Swiss Geographical Coordinates
 description:         Convert GPS Coordinates to Swiss Geographical Coordinates
                      and vice versa
@@ -18,7 +18,7 @@ cabal-version:       >=1.18
 library
     exposed-modules:     Data.Geo.Swiss.Conversion
     other-extensions:    NamedFieldPuns
-    build-depends:       base >=4.7 && < 4.10
+    build-depends:       base >=4.7 && < 4.11
 
     default-language:    Haskell2010
     hs-source-dirs:      src
@@ -29,7 +29,7 @@ Test-suite test
     Type:                exitcode-stdio-1.0
     Hs-source-dirs:      tests
     Main-is:             Main.hs
-    Build-depends:       base >= 4.7 && < 4.10
+    Build-depends:       base >= 4.7 && < 4.11
                        , swissgeo >= 0.2 && < 0.3
-                       , QuickCheck >= 2.8 && < 2.9
+                       , QuickCheck >= 2.8 && < 2.11
                        , cabal-test-quickcheck >= 0.1 && < 0.2
