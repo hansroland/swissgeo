@@ -1,5 +1,11 @@
 ### Convert World Coordinates to Swiss Coordinates
 
+[![License BSD3][badge-license]][license]
+
+[badge-license]: https://img.shields.io/badge/license-BSD3-green.svg?dummy
+[license]: https://github.com/hansroland/swissgeo/blob/master/LICENSE
+
+
 World Coordinates are the output of a normal GPS device.
 
 Swiss Coordinates or "Landeskoordinaten" are the coordinates on the official Swiss maps of swisstopo.
