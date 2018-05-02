@@ -9,6 +9,6 @@ sudo: true
 ghc:
   - "8.2"
 
-install:
+script:
 - cabal new-build
 - cabal new-test
