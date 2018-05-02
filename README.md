@@ -1,9 +1,13 @@
 ### Convert World Coordinates to Swiss Coordinates
 
-[![License BSD3][badge-license]][license]
+[![License BSD3][license-badge]][license]
+[![Build Status][build-badge]][build-result]
 
-[badge-license]: https://img.shields.io/badge/license-BSD3-green.svg?dummy
+[license-badge]: https://img.shields.io/badge/license-BSD3-green.svg?dummy
 [license]: https://github.com/hansroland/swissgeo/blob/master/LICENSE
+
+[build-badge]: https://travis-ci.org/hansroland/swissgeo.svg?branch=master
+[build-result]: https://travis-ci.org/hansroland/swissgeo
 
 
 World Coordinates are the output of a normal GPS device.
@@ -14,7 +18,7 @@ The city of Bern is 46 degress 57 minutes and 08.66 seconds North and 7 degrees 
 
 In terms of Swiss "Landeskoordinaten 1903" this is 600000 / 200000.
 
-In terms of the new "Landeskoordinaten 1995 this is 2600000 / 1200000.
+In terms of the new "Landeskoordinaten 1995" this is 2600000 / 1200000.
 
 This little library contains Haskell data types and functions to convert
 from wold coordinates to swiss coordinates and back.
@@ -46,10 +50,3 @@ swissgeo implements the exact formulas.
 
     to95 :: CH03 -> CH95                -- Convert from 1903 to 1995 Swiss coordinates
     to03 :: CH95 -> CH03                -- Convert from 1995 to 1903 Swiss coordinates
-
-
-#### Versions
-
-    0.2.0.4   -> GHC 7.10.1
-    0.2.0.3   -> GHC 7.8.4
-    0.2.0.2   -> GHC 7.8.3
