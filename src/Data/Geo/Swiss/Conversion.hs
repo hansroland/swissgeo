@@ -1,11 +1,88 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module Data.Geo.Swiss.Conversion
+-- | 
+-- = Convert World Coordinates to Swiss Coordinates
+-- __World Coordinates__ are the output of a normal GPS device.
+--
+-- __Swiss Coordinates__ or /Landeskoordinaten/ are the coordinates on the official Swiss maps of swisstopo.
+--
+-- The city of Bern is 46 degress 57 minutes and 08.66 seconds North and 7 degrees 26 minutes and 22.50 seconds East. That's what a GPS measures.
+--
+-- In terms of Swiss /Landeskoordinaten 1903/ this is 600000 / 200000.
+--
+-- In terms of the new /Landeskoordinaten 1995/ this is 2600000 / 1200000.
+--
+-- This library contains Haskell data types and functions to convert
+-- from wold coordinates to swiss coordinates and back.
+--
+-- /swissgeo/ implements the exact formulas.
+--
+-- == References: 
+--
+-- swisstopo
+-- <https://www.swisstopo.admin.ch/>
+-- 
+-- /Formeln und Konstanten für die Berechnung der Schweizerischen schiefachsigen Zylinderprojektion und der Transformation zwischen Koordinatensystemen/
+-- <https://github.com/hansroland/swissgeo/blob/master/doc/refsysd.pdf>
+--
+
+module Data.Geo.Swiss.Conversion (
+   Degree(..),
+   WGS84(..), 
+   CH03(..),
+   CH95(..),
+   CH95HP(..), 
+   deg2rad,
+   rad2deg,
+   fromHP,
+   toHP, 
+   to03, 
+   to95, 
+   wgs2chHP, 
+   wgs2ch, 
+   ch2wgsHP,
+   ch2wgs,
+   round2digs
+)
   where
 
--- | Geographical Degrees:  Deg degrees minutes seconds
+-- | Geographical Degrees:  Deg degrees minutes seconds.
+--
 --   Example: Deg 46 57 8.66
 data Degree = Deg Int Int Double
+   deriving (Eq, Show)
+
+-- | Coordiantes in the WGS System.
+-- 
+--    first degrees lattitude, then degrees longitude
+data WGS84 = WGS Degree Degree
+instance Show WGS84 where
+  show (WGS latt long)  = show latt ++ "; " ++ show long ++ ";"
+
+-- | Coordinates in the current Swiss system /Landesvermessung 1995/. 
+-- First longitude, then lattitude
+--   
+--   Here accuracy is 1 meter.
+--
+--   __Note:__ Your GPS measurements may NOT have this precision!!
+data CH95 = LV95 Int Int
+   deriving (Eq, Show)
+
+-- | High precision version of Swiss system /Landesvermessung 1995/.
+-- First longitude, then lattitude
+--
+-- Accuracy is better than 1 cm.
+-- We normally round to 2 decimal digits (= 1 cm).
+--
+-- __Note:__ Your GPS measurements may NOT have this precision!!
+data CH95HP = LV95HP Double Double
+   deriving (Eq, Show)
+
+-- | Coordinates in the old Swiss system /Landesvermessung 1903/.
+--   First longitude, then lattitude.
+--
+--   Accuracy is 1 meter.
+data CH03 = LV03 Int Int
    deriving (Eq, Show)
 
 -- | Convert Degrees to Radians
@@ -16,6 +93,7 @@ deg2rad (Deg d m s) = deg * pi /180
     d' = fromIntegral d
     m' = fromIntegral m
 
+-- | Convert Radians to Degrees
 rad2deg :: Double -> Degree
 rad2deg rad = Deg d m s
    where
@@ -25,37 +103,11 @@ rad2deg rad = Deg d m s
      m = floor mm
      s = (mm - fromIntegral m) * 60
 
--- | Coordiantes in the WGS System:
---    first degrees lattitude, then degrees longitude
-data WGS84 = WGS Degree Degree
-instance Show WGS84 where
-  show (WGS latt long)  = show latt ++ "; " ++ show long ++ ";"
-
--- | Coordinates in the current Swiss system "Landesvermessung 1995"
---   First longitude, then lattitude
---   Here accuracy is 1 meter.
---   Note: Your GPS measurements may NOT have this precision!!
-data CH95 = LV95 Int Int
-   deriving (Eq, Show)
-
--- | High precision version of Swiss system "Landesvermessung 1995"
--- Here accuracy is better than 1 cm.
--- We normally round to 2 decimal digits (= 1 cm).
--- Note: Your GPS measurements may NOT have this precision!!
-data CH95HP = LV95HP Double Double
-   deriving (Eq, Show)
-
--- | Coordinates in the old Swiss system "Landesvermessung 1903"
---   First longitude, then lattitude
---   Here accuracy is 1 meter.
-data CH03 = LV03 Int Int
-   deriving (Eq, Show)
-
 -- | Conversion from the High Precision System to the normal version
 fromHP :: CH95HP -> CH95
 fromHP (LV95HP y x) = LV95 (round y) (round x)
 
--- | Conversion fron normal 1-meter coordiantes to 1 cm coordinates.
+-- | Conversion from normal 1-meter coordiantes to 1-cm coordinates.
 -- Note: We cannot add the missing accuracy in centimeters!
 toHP :: CH95 -> CH95HP
 toHP (LV95 y x) = LV95HP (fromIntegral y) (fromIntegral x)
@@ -150,8 +202,8 @@ ch2wgsHP (LV95HP y x) = WGS psi lam
 ch2wgs :: CH95 -> WGS84
 ch2wgs = ch2wgsHP . toHP
 
--- | Find the convergence of a sequence.
--- We just search for the first element that is euql to its successsor
+-- Find the convergence of a sequence.
+-- We just search for the first element that is equal to its successsor
 firstEqual :: [Double] -> Double
 firstEqual [] = 0                  -- this should not occur
 firstEqual [x] = x

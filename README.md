@@ -25,11 +25,11 @@ from wold coordinates to swiss coordinates and back.
 
 For the conversion formulas see:
 
-* [Swiss Grid](http://www.swisstopo.admin.ch/internet/swisstopo/de/home/topics/survey/sys/refsys/projections.html)
+#### Reference:
 
 * [Formeln und Konstanten für die Berechnung der
 Schweizerischen schiefachsigen Zylinderprojektion und
-der Transformation zwischen Koordinatensystemen](http://www.swisstopo.admin.ch/internet/swisstopo/de/home/topics/survey/sys/refsys/switzerland.parsysrelated1.24280.downloadList.32633.DownloadFile.tmp/refsysd.pdf)
+der Transformation zwischen Koordinatensystemen](https://github.com/hansroland/swissgeo/blob/master/doc/refsysd.pdf)
 
 swissgeo implements the exact formulas.
 
