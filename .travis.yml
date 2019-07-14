@@ -11,6 +11,7 @@ ghc:
   - "8.4"
   - "8.6"
 
+# Attention: cabal v2-xxx didn't work !!
 script:
-- cabal v2-build
-- cabal v2-test
+- cabal new-build
+- cabal new-test
