@@ -12,5 +12,5 @@ ghc:
   - "8.6"
 
 script:
-- cabal new-build
-- cabal new-test
+- cabal v2-build
+- cabal v2-test

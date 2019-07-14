@@ -1,5 +1,5 @@
 # Stack file for swissgeo
-resolver: nightly-2018-10-01
+resolver: lts-13.28
 
 packages:
 - '.'
