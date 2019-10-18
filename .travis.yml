@@ -10,6 +10,7 @@ ghc:
   - "8.2"
   - "8.4"
   - "8.6"
+  - "8.8"
 
 # Attention: cabal v2-xxx didn't work !!
 script:
