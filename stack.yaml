@@ -1,5 +1,5 @@
 # Stack file for swissgeo
-resolver: lts-19.0
+resolver: lts-22.18
 
 packages:
 - '.'
