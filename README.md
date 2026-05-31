@@ -21,7 +21,7 @@ In terms of Swiss "Landeskoordinaten 1903" this is 600000 / 200000.
 In terms of the new "Landeskoordinaten 1995" this is 2600000 / 1200000.
 
 This little library contains Haskell data types and functions to convert
-from wold coordinates to swiss coordinates and back.
+from world coordinates to swiss coordinates and back.
 
 For the conversion formulas see:
 
